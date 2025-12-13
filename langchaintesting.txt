@@ -1,0 +1,11 @@
+Artificial Intelligence (AI) is the field of computer science that focuses on creating machines capable of performing tasks that normally require human intelligence.
+
+Machine Learning (ML) is a subset of AI where systems learn patterns from data instead of being explicitly programmed.
+
+Deep Learning is a subset of Machine Learning that uses neural networks with many layers.
+
+Large Language Models (LLMs) are trained on massive text datasets and can generate human-like responses.
+
+AI Agents are systems that use LLMs along with tools, memory, and decision-making logic to perform tasks autonomously.
+
+Retrieval-Augmented Generation (RAG) is a technique where AI retrieves information from documents before generating an answer.
