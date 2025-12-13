@@ -10,15 +10,31 @@ from langchain_core.runnables import RunnablePassthrough
 from transformers import pipeline
 
 # -------------------------------------------------
-# Page Config
+# PAGE CONFIG (IMPORTANT)
 # -------------------------------------------------
-st.set_page_config(page_title="Website RAG Bot", layout="centered")
+st.set_page_config(
+    page_title="Website RAG Bot",
+    layout="wide"
+)
 
 # -------------------------------------------------
-# Floating Chatbot CSS
+# GLOBAL CSS (FIXES WHITE PANEL & LAYOUT)
 # -------------------------------------------------
 st.markdown("""
 <style>
+
+/* Hide sidebar completely */
+section[data-testid="stSidebar"] {
+    display: none;
+}
+
+/* Center main content and limit width */
+.block-container {
+    max-width: 900px;
+    padding-top: 3rem;
+}
+
+/* Floating chatbot button */
 #chatbot-btn {
     position: fixed;
     bottom: 20px;
@@ -33,60 +49,68 @@ st.markdown("""
     cursor: pointer;
     z-index: 1000;
 }
+
+/* Floating chat window */
 #chatbox {
     position: fixed;
     bottom: 90px;
     right: 20px;
-    width: 320px;
+    width: 340px;
     height: 420px;
-    background: white;
-    border-radius: 12px;
-    padding: 12px;
-    box-shadow: 0px 4px 20px rgba(0,0,0,0.25);
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0px 6px 25px rgba(0,0,0,0.25);
     z-index: 1000;
     overflow-y: auto;
 }
+
 </style>
 """, unsafe_allow_html=True)
 
 # -------------------------------------------------
-# Session State
+# SESSION STATE
 # -------------------------------------------------
 if "show_chat" not in st.session_state:
     st.session_state.show_chat = False
 
 # -------------------------------------------------
-# Load RAG Pipeline (Cached)
+# LOAD RAG PIPELINE (CACHED)
 # -------------------------------------------------
 @st.cache_resource
 def load_rag():
+    # Load website text
     loader = TextLoader("langchaintesting.txt")
     docs = loader.load()
 
+    # Split text
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=150,
         chunk_overlap=30
     )
     chunks = splitter.split_documents(docs)
 
+    # Embeddings
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
+    # Vector DB
     vectorstore = FAISS.from_documents(chunks, embeddings)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
 
+    # LLM
     llm_pipeline = pipeline(
         "text2text-generation",
         model="google/flan-t5-small",
         max_new_tokens=150
     )
-
     llm = HuggingFacePipeline(pipeline=llm_pipeline)
 
+    # Prompt
     prompt = PromptTemplate.from_template(
         """Answer the question using ONLY the context below.
-If the answer is not present, say:
+If the answer is not in the context, say:
 "I can only answer questions related to this website."
 
 Context:
@@ -97,6 +121,7 @@ Question:
 """
     )
 
+    # LCEL RAG chain
     rag_chain = (
         {"context": retriever, "question": RunnablePassthrough()}
         | prompt
@@ -109,16 +134,16 @@ Question:
 rag = load_rag()
 
 # -------------------------------------------------
-# Floating Chatbot Button
+# FLOATING CHATBOT BUTTON
 # -------------------------------------------------
 if st.button("🤖", key="chatbot-btn"):
     st.session_state.show_chat = not st.session_state.show_chat
 
 # -------------------------------------------------
-# Chat Window
+# FLOATING CHAT WINDOW
 # -------------------------------------------------
 if st.session_state.show_chat:
-    st.markdown("<div id='chatbox'>", unsafe_allow_html=True)
+    st.markdown("<div id='chatbox' style='pointer-events:auto;'>", unsafe_allow_html=True)
 
     st.markdown("### 🤖 Website Assistant")
 
@@ -141,10 +166,10 @@ if st.session_state.show_chat:
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -------------------------------------------------
-# Main Page Content (Optional)
+# MAIN PAGE CONTENT (CLEAN)
 # -------------------------------------------------
-st.title("Website RAG Assistant")
+st.markdown("## Website RAG Assistant")
 st.write(
-    "Click the 🤖 button in the bottom-right corner to ask questions "
+    "Click the 🤖 chatbot icon in the bottom-right corner to ask questions "
     "related **only** to this website."
 )
