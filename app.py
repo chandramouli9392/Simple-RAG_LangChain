@@ -4,31 +4,27 @@ from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain.chains import RetrievalQA
 from langchain_community.llms import HuggingFacePipeline
+from langchain_core.prompts import PromptTemplate
+from langchain_core.runnables import RunnablePassthrough
 from transformers import pipeline
 
 # ----------------------------
 # Streamlit Page Config
 # ----------------------------
-st.set_page_config(
-    page_title="Website RAG Assistant",
-    layout="centered"
-)
-
+st.set_page_config(page_title="Website RAG Assistant")
 st.title("🔍 Ask About This Website")
-st.write("This assistant answers questions **only from the website content**.")
 
 # ----------------------------
 # Load RAG Pipeline (Cached)
 # ----------------------------
 @st.cache_resource
 def load_rag():
-    # Load text file
+    # Load document
     loader = TextLoader("langchaintesting.txt")
     docs = loader.load()
 
-    # Split into chunks
+    # Split text
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=150,
         chunk_overlap=30
@@ -40,33 +36,42 @@ def load_rag():
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
-    # Vector DB
+    # Vector store
     vectorstore = FAISS.from_documents(chunks, embeddings)
+    retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
 
-    # Retriever (limit chunks)
-    retriever = vectorstore.as_retriever(
-        search_kwargs={"k": 2}
-    )
-
-    # Lightweight LLM
+    # LLM
     llm_pipeline = pipeline(
         "text2text-generation",
         model="google/flan-t5-small",
         max_new_tokens=150
     )
-
     llm = HuggingFacePipeline(pipeline=llm_pipeline)
 
-    # RAG chain
-    qa = RetrievalQA.from_chain_type(
-        llm=llm,
-        retriever=retriever
+    # Prompt
+    prompt = PromptTemplate.from_template(
+        """Answer the question using only the context below.
+        If the answer is not in the context, say "I can only answer based on this website."
+
+        Context:
+        {context}
+
+        Question:
+        {question}
+        """
     )
 
-    return qa
+    # RAG Chain (LCEL – modern way)
+    rag_chain = (
+        {"context": retriever, "question": RunnablePassthrough()}
+        | prompt
+        | llm
+    )
+
+    return rag_chain
 
 
-qa = load_rag()
+rag = load_rag()
 
 # ----------------------------
 # User Input
@@ -81,8 +86,7 @@ question = st.text_input(
 # ----------------------------
 if question:
     with st.spinner("Thinking..."):
-        answer = qa(question)
+        answer = rag.invoke(question)
 
     st.subheader("📌 Answer")
     st.write(answer)
-
