@@ -9,59 +9,94 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from transformers import pipeline
 
-# ----------------------------
-# Streamlit Page Config
-# ----------------------------
-st.set_page_config(page_title="Website RAG Assistant")
-st.title("🔍 Ask About This Website")
+# -------------------------------------------------
+# Page Config
+# -------------------------------------------------
+st.set_page_config(page_title="Website RAG Bot", layout="centered")
 
-# ----------------------------
+# -------------------------------------------------
+# Floating Chatbot CSS
+# -------------------------------------------------
+st.markdown("""
+<style>
+#chatbot-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #2563eb;
+    color: white;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    font-size: 28px;
+    border: none;
+    cursor: pointer;
+    z-index: 1000;
+}
+#chatbox {
+    position: fixed;
+    bottom: 90px;
+    right: 20px;
+    width: 320px;
+    height: 420px;
+    background: white;
+    border-radius: 12px;
+    padding: 12px;
+    box-shadow: 0px 4px 20px rgba(0,0,0,0.25);
+    z-index: 1000;
+    overflow-y: auto;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# -------------------------------------------------
+# Session State
+# -------------------------------------------------
+if "show_chat" not in st.session_state:
+    st.session_state.show_chat = False
+
+# -------------------------------------------------
 # Load RAG Pipeline (Cached)
-# ----------------------------
+# -------------------------------------------------
 @st.cache_resource
 def load_rag():
-    # Load document
     loader = TextLoader("langchaintesting.txt")
     docs = loader.load()
 
-    # Split text
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=150,
         chunk_overlap=30
     )
     chunks = splitter.split_documents(docs)
 
-    # Embeddings
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
-    # Vector store
     vectorstore = FAISS.from_documents(chunks, embeddings)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
 
-    # LLM
     llm_pipeline = pipeline(
         "text2text-generation",
         model="google/flan-t5-small",
         max_new_tokens=150
     )
+
     llm = HuggingFacePipeline(pipeline=llm_pipeline)
 
-    # Prompt
     prompt = PromptTemplate.from_template(
-        """Answer the question using only the context below.
-        If the answer is not in the context, say "I can only answer based on this website."
+        """Answer the question using ONLY the context below.
+If the answer is not present, say:
+"I can only answer questions related to this website."
 
-        Context:
-        {context}
+Context:
+{context}
 
-        Question:
-        {question}
-        """
+Question:
+{question}
+"""
     )
 
-    # RAG Chain (LCEL – modern way)
     rag_chain = (
         {"context": retriever, "question": RunnablePassthrough()}
         | prompt
@@ -73,20 +108,43 @@ def load_rag():
 
 rag = load_rag()
 
-# ----------------------------
-# User Input
-# ----------------------------
-question = st.text_input(
-    "Ask a question related to this website:",
-    placeholder="Example: What is an AI Agent?"
+# -------------------------------------------------
+# Floating Chatbot Button
+# -------------------------------------------------
+if st.button("🤖", key="chatbot-btn"):
+    st.session_state.show_chat = not st.session_state.show_chat
+
+# -------------------------------------------------
+# Chat Window
+# -------------------------------------------------
+if st.session_state.show_chat:
+    st.markdown("<div id='chatbox'>", unsafe_allow_html=True)
+
+    st.markdown("### 🤖 Website Assistant")
+
+    user_question = st.text_input(
+        "Ask a question:",
+        key="chat_input",
+        placeholder="Example: What is an AI Agent?"
+    )
+
+    if user_question:
+        with st.spinner("Thinking..."):
+            answer = rag.invoke(user_question)
+
+        st.markdown("**Answer:**")
+        st.write(answer)
+
+    if st.button("❌ Close Chat"):
+        st.session_state.show_chat = False
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# -------------------------------------------------
+# Main Page Content (Optional)
+# -------------------------------------------------
+st.title("Website RAG Assistant")
+st.write(
+    "Click the 🤖 button in the bottom-right corner to ask questions "
+    "related **only** to this website."
 )
-
-# ----------------------------
-# Answer
-# ----------------------------
-if question:
-    with st.spinner("Thinking..."):
-        answer = rag.invoke(question)
-
-    st.subheader("📌 Answer")
-    st.write(answer)
