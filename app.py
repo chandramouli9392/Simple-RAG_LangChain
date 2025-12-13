@@ -1,7 +1,7 @@
 import streamlit as st
 
 from langchain_community.document_loaders import TextLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA
@@ -17,7 +17,7 @@ st.set_page_config(
 )
 
 st.title("🔍 Ask About This Website")
-st.write("This assistant answers questions **only** from the website content.")
+st.write("This assistant answers questions **only from the website content**.")
 
 # ----------------------------
 # Load RAG Pipeline (Cached)
@@ -26,29 +26,29 @@ st.write("This assistant answers questions **only** from the website content.")
 def load_rag():
     # Load text file
     loader = TextLoader("langchaintesting.txt")
-    documents = loader.load()
+    docs = loader.load()
 
     # Split into chunks
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=150,
         chunk_overlap=30
     )
-    chunks = splitter.split_documents(documents)
+    chunks = splitter.split_documents(docs)
 
-    # Create embeddings
+    # Embeddings
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
-    # Vector database
+    # Vector DB
     vectorstore = FAISS.from_documents(chunks, embeddings)
 
-    # Retriever (limit chunks to avoid token overflow)
+    # Retriever (limit chunks)
     retriever = vectorstore.as_retriever(
         search_kwargs={"k": 2}
     )
 
-    # Lightweight open-source LLM
+    # Lightweight LLM
     llm_pipeline = pipeline(
         "text2text-generation",
         model="google/flan-t5-small",
@@ -57,13 +57,14 @@ def load_rag():
 
     llm = HuggingFacePipeline(pipeline=llm_pipeline)
 
-    # RAG Chain
-    qa_chain = RetrievalQA.from_chain_type(
+    # RAG chain
+    qa = RetrievalQA.from_chain_type(
         llm=llm,
         retriever=retriever
     )
 
-    return qa_chain
+    return qa
+
 
 qa = load_rag()
 
