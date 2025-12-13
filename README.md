@@ -2,6 +2,7 @@
 
 A Simple Retrieval-Augmented Generation (RAG) project built using Streamlit + LangChain.
 This app allows users to ask questions only from a given text file, just like a website assistant chatbot.
+Here I made a Example RAG Using Text File
 
 Perfect for beginners learning RAG 💡
 
