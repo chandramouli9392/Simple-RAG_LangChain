@@ -10,54 +10,68 @@ from langchain_core.runnables import RunnablePassthrough
 from transformers import pipeline
 
 # -------------------------------------------------
-# PAGE CONFIG (IMPORTANT)
+# PAGE CONFIG
 # -------------------------------------------------
-st.set_page_config(
-    page_title="Website RAG Bot",
-    layout="wide"
-)
+st.set_page_config(page_title="Website RAG Bot", layout="wide")
 
 # -------------------------------------------------
-# GLOBAL CSS (FIXES WHITE PANEL & LAYOUT)
+# GLOBAL CSS (FIXED BOT ICON + CHATBOX)
 # -------------------------------------------------
 st.markdown("""
 <style>
 
-/* Hide sidebar completely */
+/* Hide sidebar */
 section[data-testid="stSidebar"] {
     display: none;
 }
 
-/* Center main content and limit width */
+/* Center main content */
 .block-container {
     max-width: 900px;
     padding-top: 3rem;
 }
 
-/* Floating chatbot button */
-#chatbot-btn {
+/* Floating bot toggle (checkbox disguised as button) */
+div[data-testid="stCheckbox"] {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background-color: #2563eb;
-    color: white;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    font-size: 28px;
-    border: none;
-    cursor: pointer;
     z-index: 1000;
 }
 
-/* Floating chat window */
+/* Hide checkbox label */
+div[data-testid="stCheckbox"] label {
+    display: none;
+}
+
+/* Style checkbox as bot icon */
+div[data-testid="stCheckbox"] input[type="checkbox"] {
+    appearance: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #2563eb;
+    cursor: pointer;
+}
+
+div[data-testid="stCheckbox"] input[type="checkbox"]::after {
+    content: "🤖";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    color: white;
+    height: 100%;
+}
+
+/* Floating chatbox */
 #chatbox {
     position: fixed;
-    bottom: 90px;
+    bottom: 95px;
     right: 20px;
     width: 340px;
     height: 420px;
-    background: #ffffff;
+    background: white;
     border-radius: 14px;
     padding: 14px;
     box-shadow: 0px 6px 25px rgba(0,0,0,0.25);
@@ -69,45 +83,34 @@ section[data-testid="stSidebar"] {
 """, unsafe_allow_html=True)
 
 # -------------------------------------------------
-# SESSION STATE
-# -------------------------------------------------
-if "show_chat" not in st.session_state:
-    st.session_state.show_chat = False
-
-# -------------------------------------------------
 # LOAD RAG PIPELINE (CACHED)
 # -------------------------------------------------
 @st.cache_resource
 def load_rag():
-    # Load website text
     loader = TextLoader("langchaintesting.txt")
     docs = loader.load()
 
-    # Split text
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=150,
         chunk_overlap=30
     )
     chunks = splitter.split_documents(docs)
 
-    # Embeddings
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
-    # Vector DB
     vectorstore = FAISS.from_documents(chunks, embeddings)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
 
-    # LLM
     llm_pipeline = pipeline(
         "text2text-generation",
         model="google/flan-t5-small",
         max_new_tokens=150
     )
+
     llm = HuggingFacePipeline(pipeline=llm_pipeline)
 
-    # Prompt
     prompt = PromptTemplate.from_template(
         """Answer the question using ONLY the context below.
 If the answer is not in the context, say:
@@ -121,7 +124,6 @@ Question:
 """
     )
 
-    # LCEL RAG chain
     rag_chain = (
         {"context": retriever, "question": RunnablePassthrough()}
         | prompt
@@ -134,23 +136,22 @@ Question:
 rag = load_rag()
 
 # -------------------------------------------------
-# FLOATING CHATBOT BUTTON
+# BOT ICON TOGGLE (THIS NEVER MOVES)
 # -------------------------------------------------
-if st.button("🤖", key="chatbot-btn"):
-    st.session_state.show_chat = not st.session_state.show_chat
+open_chat = st.checkbox("", key="bot_toggle")
 
 # -------------------------------------------------
-# FLOATING CHAT WINDOW
+# CHAT WINDOW
 # -------------------------------------------------
-if st.session_state.show_chat:
-    st.markdown("<div id='chatbox' style='pointer-events:auto;'>", unsafe_allow_html=True)
+if open_chat:
+    st.markdown("<div id='chatbox'>", unsafe_allow_html=True)
 
     st.markdown("### 🤖 Website Assistant")
 
     user_question = st.text_input(
         "Ask a question:",
-        key="chat_input",
-        placeholder="Example: What is an AI Agent?"
+        placeholder="Example: What is an AI Agent?",
+        key="chat_input"
     )
 
     if user_question:
@@ -160,16 +161,13 @@ if st.session_state.show_chat:
         st.markdown("**Answer:**")
         st.write(answer)
 
-    if st.button("❌ Close Chat"):
-        st.session_state.show_chat = False
-
     st.markdown("</div>", unsafe_allow_html=True)
 
 # -------------------------------------------------
-# MAIN PAGE CONTENT (CLEAN)
+# MAIN PAGE CONTENT
 # -------------------------------------------------
 st.markdown("## Website RAG Assistant")
 st.write(
-    "Click the 🤖 chatbot icon in the bottom-right corner to ask questions "
+    "Click the 🤖 bot icon in the bottom-right corner to ask questions "
     "related **only** to this website."
 )
