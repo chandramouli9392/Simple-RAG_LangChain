@@ -1,17 +1,46 @@
 import streamlit as st
+import torch
 
 from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_community.vectorstores import FAISS
-from langchain_community.llms import HuggingFacePipeline
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
+from langchain_core.language_models.llms import LLM
 
-from transformers import pipeline
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
+
+# ----------------------------
+# Custom LLM (NO pipeline)
+# ----------------------------
+class FlanT5LLM(LLM):
+    tokenizer: AutoTokenizer
+    model: AutoModelForSeq2SeqLM
+
+    @property
+    def _llm_type(self):
+        return "flan-t5-custom"
+
+    def _call(self, prompt: str, stop=None):
+        inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
+
+        with torch.no_grad():
+            outputs = self.model.generate(
+                **inputs,
+                max_new_tokens=150
+            )
+
+        return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+
+# ----------------------------
+# Streamlit UI
+# ----------------------------
 st.set_page_config(page_title="Website RAG Assistant")
 st.title("🔍 Ask About This Website")
+
 
 @st.cache_resource
 def load_rag():
@@ -31,14 +60,10 @@ def load_rag():
     vectorstore = FAISS.from_documents(chunks, embeddings)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
 
-    # 🔥 SAFE LLM PIPELINE (NO text2text-generation)
-    llm_pipeline = pipeline(
-        "text-generation",
-        model="google/flan-t5-small",
-        max_new_tokens=150
-    )
+    tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-small")
+    model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-small")
 
-    llm = HuggingFacePipeline(pipeline=llm_pipeline)
+    llm = FlanT5LLM(tokenizer=tokenizer, model=model)
 
     prompt = PromptTemplate.from_template(
         """Answer the question using only the context below.
