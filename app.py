@@ -7,7 +7,8 @@ from langchain_community.vectorstores import FAISS
 from langchain_community.llms import HuggingFacePipeline
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
-from transformers import pipeline
+
+from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
 
 # ----------------------------
 # Streamlit Page Config
@@ -20,48 +21,46 @@ st.title("🔍 Ask About This Website")
 # ----------------------------
 @st.cache_resource
 def load_rag():
-    # Load document
     loader = TextLoader("langchaintesting.txt")
     docs = loader.load()
 
-    # Split text
     splitter = RecursiveCharacterTextSplitter(
         chunk_size=150,
         chunk_overlap=30
     )
     chunks = splitter.split_documents(docs)
 
-    # Embeddings
     embeddings = HuggingFaceEmbeddings(
         model_name="sentence-transformers/all-MiniLM-L6-v2"
     )
 
-    # Vector store
     vectorstore = FAISS.from_documents(chunks, embeddings)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
 
-    # LLM
+    tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-small")
+    model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-small")
+
     llm_pipeline = pipeline(
-        "text2text-generation",
-        model="google/flan-t5-small",
+        task="text2text-generation",
+        model=model,
+        tokenizer=tokenizer,
         max_new_tokens=150
     )
+
     llm = HuggingFacePipeline(pipeline=llm_pipeline)
 
-    # Prompt
     prompt = PromptTemplate.from_template(
         """Answer the question using only the context below.
-        If the answer is not in the context, say "I can only answer based on this website."
+If the answer is not in the context, say "I can only answer based on this website."
 
-        Context:
-        {context}
+Context:
+{context}
 
-        Question:
-        {question}
-        """
+Question:
+{question}
+"""
     )
 
-    # RAG Chain (LCEL – modern way)
     rag_chain = (
         {"context": retriever, "question": RunnablePassthrough()}
         | prompt
