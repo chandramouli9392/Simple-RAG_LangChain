@@ -8,17 +8,11 @@ from langchain_community.llms import HuggingFacePipeline
 from langchain_core.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 
-from transformers import AutoTokenizer, AutoModelForSeq2SeqLM, pipeline
+from transformers import pipeline
 
-# ----------------------------
-# Streamlit Page Config
-# ----------------------------
 st.set_page_config(page_title="Website RAG Assistant")
 st.title("🔍 Ask About This Website")
 
-# ----------------------------
-# Load RAG Pipeline (Cached)
-# ----------------------------
 @st.cache_resource
 def load_rag():
     loader = TextLoader("langchaintesting.txt")
@@ -37,13 +31,10 @@ def load_rag():
     vectorstore = FAISS.from_documents(chunks, embeddings)
     retriever = vectorstore.as_retriever(search_kwargs={"k": 2})
 
-    tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-small")
-    model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-small")
-
+    # 🔥 SAFE LLM PIPELINE (NO text2text-generation)
     llm_pipeline = pipeline(
-        task="text2text-generation",
-        model=model,
-        tokenizer=tokenizer,
+        "text-generation",
+        model="google/flan-t5-small",
         max_new_tokens=150
     )
 
@@ -72,17 +63,11 @@ Question:
 
 rag = load_rag()
 
-# ----------------------------
-# User Input
-# ----------------------------
 question = st.text_input(
     "Ask a question related to this website:",
     placeholder="Example: What is an AI Agent?"
 )
 
-# ----------------------------
-# Answer
-# ----------------------------
 if question:
     with st.spinner("Thinking..."):
         answer = rag.invoke(question)
