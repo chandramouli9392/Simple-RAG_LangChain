@@ -1,4 +1,9 @@
-transformers>=4.36.2
-torch>=2.1.0
+streamlit
+langchain
+langchain-community
+langchain-text-splitters
+sentence-transformers
+faiss-cpu
+transformers
+torch
 sentencepiece
-accelerate
