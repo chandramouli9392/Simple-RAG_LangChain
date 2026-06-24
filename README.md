@@ -1,107 +1,75 @@
-# 🚀 Simple RAG Assistant
+## 📂 Project Structure
 
 <div align="center">
 
-<img src="https://readme-typing-svg.herokuapp.com?font=Poppins&weight=700&size=30&pause=1000&color=00D9FF&center=true&vCenter=true&width=900&lines=Retrieval-Augmented+Generation+(RAG);LangChain+%7C+FAISS+%7C+Streamlit;AI-Powered+Document+Assistant;Semantic+Search+Made+Simple" />
+<img src="https://readme-typing-svg.herokuapp.com?font=Poppins&weight=700&size=24&pause=1000&color=36BCF7&center=true&vCenter=true&width=700&lines=Clean+Project+Architecture;Modular+RAG+Pipeline;Easy+to+Understand+for+Beginners" />
 
 </div>
-
----
-
-<div align="center">
-
-### ⚡ Live Workflow
-
-<img src="https://media.giphy.com/media/f3iwJFOVOwuy7K6FFw/giphy.gif" width="700">
-
-</div>
-
----
-
-## 🎯 Architecture
-
-<div align="center">
-
-```mermaid
-flowchart LR
-    A[📄 Documents] -->|Chunking| B[🧩 Text Chunks]
-    B --> C[🧠 Embeddings]
-    C --> D[(⚡ FAISS)]
-    E[👤 User Query] --> F[🔍 Retriever]
-    F --> D
-    D --> G[📚 Context]
-    G --> H[🤖 FLAN-T5]
-    H --> I[✨ Answer]
-```
-
-</div>
-
----
-
-## ⚙️ Tech Stack
-
-<p align="center">
-<img src="https://skillicons.dev/icons?i=python,streamlit,github,vscode" />
-</p>
-
----
-
-## 📊 Project Stats
-
-<p align="center">
-<img src="https://github-readme-stats.vercel.app/api?username=chandramouli9392&show_icons=true&theme=tokyonight" />
-</p>
-
----
-
-## 🔥 RAG Pipeline Animation
-
-<p align="center">
 
 ```text
-📄 Document
-      ↓
-✂️ Chunking
-      ↓
-🧠 Embeddings
-      ↓
-⚡ FAISS Storage
-      ↓
-🔍 Retrieval
-      ↓
-🤖 LLM
-      ↓
-✨ Accurate Answer
+📦 simple-rag
+│
+├── 📄 app.py
+│   ├── Streamlit User Interface
+│   ├── Chatbot Logic
+│   └── RAG Pipeline Execution
+│
+├── 📄 langchaintesting.txt
+│   └── Knowledge Base / Source Document
+│
+├── 📄 requirements.txt
+│   └── Project Dependencies
+│
+├── 📄 README.md
+│   └── Project Documentation
+│
+└── 📁 assets
+    ├── 🖼️ screenshots
+    └── 🎥 demo.gif
 ```
 
-</p>
+---
+
+### 🔍 File Responsibilities
+
+| File                   | Purpose                                          |
+| ---------------------- | ------------------------------------------------ |
+| `app.py`               | Main Streamlit application and chatbot interface |
+| `langchaintesting.txt` | Document used as the knowledge source            |
+| `requirements.txt`     | Python package dependencies                      |
+| `README.md`            | Project documentation                            |
+| `assets/`              | Screenshots, GIFs and project visuals            |
 
 ---
 
-## 🌟 Features
+### ⚡ RAG Processing Flow
 
-<img src="https://user-images.githubusercontent.com/74038190/212284068-0c0d2f7f-6d3c-4f2f-95d3-c44cb73e5c43.gif">
+```mermaid
+flowchart TD
 
-✅ Semantic Search
+A["📄 langchaintesting.txt"]
+--> B["✂️ Text Chunking"]
 
-✅ FAISS Vector Database
+B --> C["🧠 Sentence Transformers"]
 
-✅ Context-Aware Responses
+C --> D["⚡ FAISS Vector Store"]
 
-✅ Streamlit Chat UI
+E["👤 User Query"]
+--> F["🔍 Similarity Search"]
 
-✅ Beginner Friendly
+F --> D
 
-✅ No API Keys Required
+D --> G["📚 Relevant Context"]
 
-✅ Deployable on Streamlit Cloud
+G --> H["🤖 FLAN-T5 LLM"]
 
----
+H --> I["✨ Final Answer"]
+```
 
 <div align="center">
 
-### 🚀 Ask Questions → Retrieve Context → Generate Answers
+### 🚀 Simple Yet Powerful Architecture
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:00D9FF,100:7F00FF&height=150&section=footer&text=Happy%20Building!&fontSize=40&fontColor=ffffff"/>
+<img src="https://capsule-render.vercel.app/api?type=rect&color=gradient&height=120&section=header&text=Document%20→%20Embeddings%20→%20Retrieval%20→%20Generation&fontSize=25&fontColor=fff" />
 
 </div>
