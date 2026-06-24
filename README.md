@@ -1,271 +1,107 @@
 # 🚀 Simple RAG Assistant
 
-### Intelligent Document Question Answering with LangChain, FAISS & Streamlit
+<div align="center">
 
-![Python](https://img.shields.io/badge/Python-3.10+-blue)
-![LangChain](https://img.shields.io/badge/LangChain-LCEL-green)
-![Streamlit](https://img.shields.io/badge/Streamlit-App-red)
-![FAISS](https://img.shields.io/badge/VectorDB-FAISS-orange)
-![Open%20Source](https://img.shields.io/badge/Open%20Source-Friendly-purple)
+<img src="https://readme-typing-svg.herokuapp.com?font=Poppins&weight=700&size=30&pause=1000&color=00D9FF&center=true&vCenter=true&width=900&lines=Retrieval-Augmented+Generation+(RAG);LangChain+%7C+FAISS+%7C+Streamlit;AI-Powered+Document+Assistant;Semantic+Search+Made+Simple" />
+
+</div>
 
 ---
 
-## 🌟 Overview
+<div align="center">
 
-**Simple RAG Assistant** is a modern Retrieval-Augmented Generation (RAG) application that transforms static documents into an intelligent AI-powered knowledge assistant.
+### ⚡ Live Workflow
 
-Instead of generating responses from general knowledge, the assistant retrieves relevant information from your documents and generates context-aware answers, ensuring higher accuracy and reduced hallucinations.
+<img src="https://media.giphy.com/media/f3iwJFOVOwuy7K6FFw/giphy.gif" width="700">
 
-Built with **LangChain**, **FAISS**, **Sentence Transformers**, and **Streamlit**, this project demonstrates the complete RAG workflow in a beginner-friendly yet production-inspired architecture.
+</div>
 
 ---
 
-## 🎥 How It Works
+## 🎯 Architecture
+
+<div align="center">
 
 ```mermaid
 flowchart LR
-    A[Text Documents] --> B[Chunking]
-    B --> C[Embeddings]
-    C --> D[FAISS Vector Store]
-    E[User Question] --> F[Retriever]
+    A[📄 Documents] -->|Chunking| B[🧩 Text Chunks]
+    B --> C[🧠 Embeddings]
+    C --> D[(⚡ FAISS)]
+    E[👤 User Query] --> F[🔍 Retriever]
     F --> D
-    D --> G[Relevant Context]
-    G --> H[LLM Generation]
-    H --> I[Accurate Answer]
+    D --> G[📚 Context]
+    G --> H[🤖 FLAN-T5]
+    H --> I[✨ Answer]
 ```
 
----
-
-## 🧠 What is Retrieval-Augmented Generation (RAG)?
-
-RAG combines the power of:
-
-### 🔍 Retrieval
-
-Searches and retrieves the most relevant information from your documents.
-
-### 🤖 Generation
-
-Uses an AI language model to generate answers based on the retrieved context.
-
-This approach significantly improves reliability by grounding responses in real data instead of relying solely on model memory.
+</div>
 
 ---
 
-## ✨ Key Features
+## ⚙️ Tech Stack
 
-### 📚 Document-Aware Intelligence
-
-Ask questions directly from your custom knowledge base.
-
-### ⚡ Semantic Search
-
-Uses vector embeddings to understand meaning rather than exact keywords.
-
-### 🗂️ FAISS Vector Database
-
-Efficient similarity search for lightning-fast retrieval.
-
-### 🤖 Interactive Chat Assistant
-
-Floating chatbot experience with a clean and modern interface.
-
-### 🔒 Reduced Hallucinations
-
-Answers are generated from retrieved context only.
-
-### 🌐 Streamlit Ready
-
-Deploy instantly on Streamlit Cloud.
-
-### 🆓 Open Source Stack
-
-No paid APIs required.
+<p align="center">
+<img src="https://skillicons.dev/icons?i=python,streamlit,github,vscode" />
+</p>
 
 ---
 
-## 🏗️ System Architecture
+## 📊 Project Stats
+
+<p align="center">
+<img src="https://github-readme-stats.vercel.app/api?username=chandramouli9392&show_icons=true&theme=tokyonight" />
+</p>
+
+---
+
+## 🔥 RAG Pipeline Animation
+
+<p align="center">
 
 ```text
-Document
-    │
-    ▼
-Text Splitter
-    │
-    ▼
-Embedding Model
-    │
-    ▼
-FAISS Vector Store
-    │
-    ▼
-Retriever
-    │
-    ▼
-LLM
-    │
-    ▼
-Generated Answer
+📄 Document
+      ↓
+✂️ Chunking
+      ↓
+🧠 Embeddings
+      ↓
+⚡ FAISS Storage
+      ↓
+🔍 Retrieval
+      ↓
+🤖 LLM
+      ↓
+✨ Accurate Answer
 ```
 
----
-
-## 🛠️ Technology Stack
-
-| Component       | Technology            |
-| --------------- | --------------------- |
-| Language        | Python                |
-| Framework       | LangChain (LCEL)      |
-| Embeddings      | Sentence Transformers |
-| Vector Database | FAISS                 |
-| Frontend        | Streamlit             |
-| LLM             | FLAN-T5               |
-| Deployment      | Streamlit Cloud       |
+</p>
 
 ---
 
-## 📂 Project Structure
+## 🌟 Features
 
-```bash
-simple-rag/
-│
-├── app.py
-├── langchaintesting.txt
-├── requirements.txt
-└── README.md
-```
+<img src="https://user-images.githubusercontent.com/74038190/212284068-0c0d2f7f-6d3c-4f2f-95d3-c44cb73e5c43.gif">
 
----
+✅ Semantic Search
 
-## ⚙️ Installation
+✅ FAISS Vector Database
 
-### 1️⃣ Clone Repository
+✅ Context-Aware Responses
 
-```bash
-git clone https://github.com/yourusername/simple-rag.git
+✅ Streamlit Chat UI
 
-cd simple-rag
-```
+✅ Beginner Friendly
 
-### 2️⃣ Install Dependencies
+✅ No API Keys Required
 
-```bash
-pip install -r requirements.txt
-```
-
-### 3️⃣ Launch Application
-
-```bash
-streamlit run app.py
-```
+✅ Deployable on Streamlit Cloud
 
 ---
 
-## 🚀 Usage
+<div align="center">
 
-1. Start the Streamlit application.
-2. Open the browser interface.
-3. Click the floating chatbot icon.
-4. Ask questions about your document.
-5. Receive context-aware AI responses instantly.
+### 🚀 Ask Questions → Retrieve Context → Generate Answers
 
----
+<img src="https://capsule-render.vercel.app/api?type=waving&color=0:00D9FF,100:7F00FF&height=150&section=footer&text=Happy%20Building!&fontSize=40&fontColor=ffffff"/>
 
-## 📄 Custom Knowledge Base
-
-The assistant currently uses:
-
-```text
-langchaintesting.txt
-```
-
-You can replace it with:
-
-* Website Content
-* Documentation
-* Product Manuals
-* FAQs
-* Research Notes
-* Study Material
-* Company Knowledge Base
-
----
-
-## 🎯 Example Queries
-
-```text
-What services does the company provide?
-
-Summarize the document.
-
-Who is the founder?
-
-What are the key features mentioned?
-```
-
----
-
-## ☁️ Deployment
-
-### Deploy on Streamlit Cloud
-
-1. Push project to GitHub
-2. Connect repository to Streamlit Cloud
-3. Deploy with one click
-4. Share your AI assistant globally
-
----
-
-## 📈 Future Enhancements
-
-* PDF Support
-* Multiple Document Uploads
-* Chat History Memory
-* Hybrid Search
-* OpenAI / Claude Integration
-* Source Citations
-* Authentication System
-* Multi-Language Support
-
----
-
-## 🎓 Learning Outcomes
-
-This project helps developers understand:
-
-* Vector Embeddings
-* Semantic Search
-* Document Chunking
-* Retrieval Pipelines
-* LangChain LCEL
-* FAISS Indexing
-* Streamlit Deployment
-* End-to-End RAG Systems
-
----
-
-## 👨‍💻 Author
-
-### Boppana Chandramouli
-
-AI Engineer • Machine Learning Enthusiast • Generative AI Developer
-
-Focused on building intelligent AI systems, RAG applications, LLM-powered products, and real-world machine learning solutions.
-
----
-
-## ⭐ Support
-
-If you found this project useful:
-
-⭐ Star the repository
-
-🍴 Fork the project
-
-🚀 Build your own AI assistant
-
-📢 Share it with the community
-
----
-
-> "Retrieval-Augmented Generation bridges the gap between static knowledge and intelligent conversations."
+</div>
